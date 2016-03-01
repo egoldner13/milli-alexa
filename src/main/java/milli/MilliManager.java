@@ -4,6 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+import java.util.List;
 
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
@@ -15,11 +20,16 @@ import com.amazon.speech.ui.SimpleCard;
 
 import milli.SkillContext;
 import milli.MilliDevice;
+import milli.ConnectSSH;
+
+
+
 
 public class MilliManager {
     private static MilliDevice CURRENT_APPLIANCE;
-
-    private static final String cmd_prefix = "ssh ssn@hacklap net_mgr -d ";
+    
+    private String cmd = "ssh ssn@hacklap -p 32 net_mgr -d fd04:7c3e:be2f:1:213:5005:ff06:621c mnic io get 17";
+    private String[] net_mgr_cmd = new String[] {"ssh",  "ssn@hacklap",  "-p",  "32", "net_mgr", "-d", null, "mnic", "io", null};
     public  final String help_text = "With Milli, you can extend the capibilities of your smart home"
 			  		+ " and get information about the status of your appliances."
 					+ "You could say did I close the garage door? or are my bedroom lights on?"
@@ -49,41 +59,52 @@ public class MilliManager {
     public SpeechletResponse handleGetStatusRequest(Intent intent, Session session) {	
     	Slot applianceSlot = intent.getSlot("appliance");
     	String name = applianceSlot.getValue();
+    	String speech_output = "";
     	
-        String speech_output = "";
+    	ConnectSSH connect = new ConnectSSH();
+    	List<String> output = null;
         if (name.equals("garage door")){
         	CURRENT_APPLIANCE = GARAGE_DOOR;
+        	output = connect.executeFile("/home/ciq/getStatusOfDoor.sh");
         } else if (name.equals("light")){
         	CURRENT_APPLIANCE = LIGHT;
+        	output = connect.executeFile("/home/ciq/getStatusOfLight.sh");
         } else {
         	//appliance name was not recognized 
         	speech_output = "I'm sorry, but I could not find an appliance named " + name;
             return getTellSpeechletResponse(speech_output);
         }
+        String outputStr = null;
+        for (String line : output){
+        	outputStr = outputStr + line;
+		}
+        
         String action;
         String reaction;
-        String changeStatusAction;
+
         String changeStatusText;
-        //int status = getStatusOfAppliance(CURRENT_APPLIANCE);
-        int status = 1;
+        int status = outputStr.contains("1") ? 1 : -1;
+        status = outputStr.contains("0") ? 0 : status;
+
         if (status == 1){
         	action = CURRENT_APPLIANCE.getType().equals("door") ? "open" : "off";
         	reaction = CURRENT_APPLIANCE.getType().equals("door") ? "close it?" : "turn it on?";
         	speech_output = "the " + CURRENT_APPLIANCE.getName() + " is " + action + ", would you like me to " + reaction;
-        	
-        	changeStatusAction = "clr 16";
+      
         	changeStatusText = CURRENT_APPLIANCE.getType().equals("door") ? "closing the garage door" : "turning on the light";
         	
-        } else {
+        } else if (status == 0 ){
         	action = CURRENT_APPLIANCE.getType().equals("door") ? "closed" : "on";
         	reaction = CURRENT_APPLIANCE.getType().equals("door") ? "open it?" : "turn it off?";
         	speech_output = "the " + CURRENT_APPLIANCE.getName() + " is " + action + ", would you like me to " + reaction;
         	
-        	changeStatusAction = "set 16";
         	changeStatusText = CURRENT_APPLIANCE.getType().equals("door") ? "opening the garage door" : "turning off the light";
+        } else {
+        	speech_output = speech_output + " I'm sorry, there was a problem issuing the net manager command for " + name;
+            return getTellSpeechletResponse(speech_output);
         }
-        
-        CURRENT_APPLIANCE.setNextAction(changeStatusAction);
+
+        CURRENT_APPLIANCE.setNextAction(reaction);
         CURRENT_APPLIANCE.setNextText(changeStatusText);
         return getAskSpeechletResponse(speech_output, help_text);
      }
@@ -97,16 +118,26 @@ public class MilliManager {
      * @return int status of appliance (1 = off/closed, 0 = on/open)
      */
     public int getStatusOfAppliance(MilliDevice CURRENT_APPLIANCE){
-    	String cmd = cmd_prefix + CURRENT_APPLIANCE.getMac_addr() + " mnic io get 17"; 
+    	net_mgr_cmd[6] = CURRENT_APPLIANCE.getMac_addr();
+    	net_mgr_cmd[9] = "get 17";
+
     	//execute net manager command
     	Runtime rt = Runtime.getRuntime();
     	Process pr = null;
     	try {
 			pr = rt.exec(cmd);
+			
+			try {
+				pr.waitFor();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (IOException e1) {
 			//To Do: log error
 		}
-    	if (pr.equals(null)) return -1;
+ 
+    	if (pr == null) return -1;
     	
     	InputStream stdin = pr.getInputStream();
     	InputStreamReader isr = new InputStreamReader(stdin);
@@ -119,11 +150,12 @@ public class MilliManager {
 			e.printStackTrace();
 		}
     	
-		if (response.equals(null)) return -1;
+		//if (response.equals(null)) return -1;
 		
     	//net_mgr -d fd04:7c3e:be2f:1:213:5005:ff06:621c mnic io get 17
     	//Response is “IO 17 = 1” for light is off.
 		return response.charAt(response.length()-1);
+		//return response.toString();
     
     }
 
@@ -137,33 +169,20 @@ public class MilliManager {
      * 
      */
     public SpeechletResponse handleChangeStatusRequest(Session session) {
-    	String speechText = "Ok" + CURRENT_APPLIANCE.getNextAction();
+    	String speechText = "Ok" + CURRENT_APPLIANCE.getNextText();
 
-    	//prepare net manager command
-    	String cmd = cmd_prefix + CURRENT_APPLIANCE.getMac_addr() + " mnic io " + CURRENT_APPLIANCE.getNextAction();
-
-    	//execute net manager command
-    	Runtime rt = Runtime.getRuntime();
-    	Process pr = null;
-    	try {
-			pr = rt.exec(cmd);
-		} catch (IOException e1) {
-			//To Do: log error
-		}
-    	if (pr.equals(null)) return getTellSpeechletResponse("Failure to issue net manager command");
-
-    	//UNCOMMENT WHEN LOGGING ADDED
-//    	InputStream stdin = pr.getInputStream();
-//    	InputStreamReader isr = new InputStreamReader(stdin);
-//    	BufferedReader br = new BufferedReader(isr);
-//    	String response = null;
-//		try {
-//			response = br.readLine();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-
+    	ConnectSSH connect = new ConnectSSH();
+    	List<String> output = null;
+    	if (CURRENT_APPLIANCE.getName().equals("garage_door")){    		
+    		output = connect.executeFile("/home/ciq/toggleDoor.sh");
+    	} else {
+    		if (CURRENT_APPLIANCE.getNextAction().equals("turn it on?")){
+    			output = connect.executeFile("/home/ciq/turnOnLight.sh");
+    		} else {
+    			output = connect.executeFile("/home/ciq/turnOffLight.sh");
+    		}
+    	}
+    	
     	return getTellSpeechletResponse(speechText);	
 
      }
@@ -172,13 +191,14 @@ public class MilliManager {
     	String speechText = "the temperature is ";
 
     	//prepare net manager command
-    	String cmd = cmd_prefix + "fd04:7c3e:be2f:1:213:5005:ff06:6259 mnic io adc 30";
+    	net_mgr_cmd[6] = "fd04:7c3e:be2f:1:213:5005:ff06:6259";
+    	net_mgr_cmd[9] = "adc 30";
 
     	//execute net manager command
     	Runtime rt = Runtime.getRuntime();
     	Process pr = null;
     	try {
-			pr = rt.exec(cmd);
+			pr = rt.exec(net_mgr_cmd);
 		} catch (IOException e1) {
 			//To Do: log error
 		}
@@ -196,9 +216,10 @@ public class MilliManager {
 		}
 		
 		if (response.equals(null)) return getTellSpeechletResponse("Error: Unable in net manager command response");
-		String temp = response.substring(0, response.length()-2);
+		String output = response.substring(0, response.length()-2);
+		double temp = (Double.parseDouble(output) - 1035) / -5.5 ;
 		
-		speechText = speechText + temp + "milli volts";
+		speechText = speechText + String.valueOf(temp) + "degrees Celcius";
 
     	return getTellSpeechletResponse(speechText);	
 
@@ -209,13 +230,14 @@ public class MilliManager {
     	String speechText = "the gas level is at";
 
     	//prepare net manager command
-    	String cmd = cmd_prefix + "fd04:7c3e:be2f:1:213:5005:ff06:6217 mnic io adc 23";
+    	net_mgr_cmd[6] = "fd04:7c3e:be2f:1:213:5005:ff06:6217";
+    	net_mgr_cmd[9] = "adc 23";
 
     	//execute net manager command
     	Runtime rt = Runtime.getRuntime();
     	Process pr = null;
     	try {
-			pr = rt.exec(cmd);
+			pr = rt.exec(net_mgr_cmd);
 		} catch (IOException e1) {
 			//To Do: log error
 		}
@@ -243,13 +265,14 @@ public class MilliManager {
     
     public SpeechletResponse handleStatusOfCarRequest(Intent intent, Session session) {
     	//prepare net manager command
-    	String cmd = cmd_prefix + "fd04:7c3e:be2f:1:213:5005:ff06:6214 mnic io get 17";
+    	net_mgr_cmd[6] = "fd04:7c3e:be2f:1:213:5005:ff06:6214";
+    	net_mgr_cmd[9] = "get 17";
 
     	//execute net manager command
     	Runtime rt = Runtime.getRuntime();
     	Process pr = null;
     	try {
-			pr = rt.exec(cmd);
+			pr = rt.exec(net_mgr_cmd);
 		} catch (IOException e1) {
 			//To Do: log error
 		}
