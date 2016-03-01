@@ -1,0 +1,46 @@
+{
+  "intents": [
+    {
+      "intent": "GetStatusOfAppliance",
+      "slots": [
+        {
+          "name": "appliance",
+          "type": "LIST_OF_APPS"
+        }
+      ]
+    },
+    {
+      "intent": "ChangeStatusOfAppliance"
+    },
+    {
+      "intent": "GetTemperatureIntent", 
+      "slots": [
+        {
+          "name": "room",
+          "type": "LIST_OF_ROOMS"
+        }
+      ]
+    },
+    {
+      "intent": "GetGasLevelIntent", 
+      "slots": [
+        {
+          "name": "appliance",
+          "type": "LIST_OF_ROOMS"
+        }
+      ]
+    },
+    {
+      "intent": "GetStatusOfCar"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}

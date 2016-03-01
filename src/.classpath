@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/alexa-skills-kit-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/jetty-server-9.0.6.v20130930.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/aws-lambda-java-core-1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/commons-io-1.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/commons-lang3-3.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/egoldner/Desktop/milli&amp;alexa/extensions/slf4j-api-1.7.17.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

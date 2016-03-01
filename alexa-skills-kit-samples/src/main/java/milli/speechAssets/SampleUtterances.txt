@@ -1,0 +1,39 @@
+GetStatusOfAppliance if {appliance} is open
+GetStatusOfAppliance if {appliance} is closed
+GetStatusOfAppliance if the {appliance} is open
+GetStatusOfAppliance if the {appliance} is closed
+GetStatusOfAppliance if I left the {appliance} open
+GetStatusOfAppliance if I closed the {appliance}
+GetStatusOfAppliance about {appliance}
+GetStatusOfAppliance about the {appliance}
+GetStatusOfAppliance if {appliance} is on
+GetStatusOfAppliance if {appliance} is off
+GetStatusOfAppliance if the {appliance} is on
+GetStatusOfAppliance if the {appliance} is off
+GetStatusOfAppliance if I left the {appliance} on
+GetStatusOfAppliance if I shut off the {appliance}
+GetStatusOfAppliance if I shut the {appliance} off
+GetStatusOfAppliance about {appliance}
+GetStatusOfAppliance about the {appliance}
+
+ChangeStatusOfAppliance yes
+ChangeStatusOfAppliance yup
+ChangeStatusOfAppliance sure
+ChangeStatusOfAppliance yes please
+
+GetTemperatureIntent ww {room}
+GetTemperatureIntent what is the temperature in the {room}
+
+GetGasLevelIntent can you check the gas level in {room}
+GetGasLevelIntent what is the gas level in {room}
+
+GetStatusOfCar is my car outside?
+GetStatusOfCar is the car outside?
+GetStatusOfCar is the car home?
+GetStatusOfCar where is the car? 
+
+AMAZON.StopIntent no
+AMAZON.StopIntent nope
+AMAZON.StopIntent no thanks
+AMAZON.StopIntent no thank you
+
