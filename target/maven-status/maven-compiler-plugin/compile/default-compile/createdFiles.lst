@@ -1,0 +1,7 @@
+milli/MilliDevice.class
+milli/DBManager.class
+milli/SkillContext.class
+milli/MilliSpeechletRequestStreamHandler.class
+milli/MilliSpeechlet.class
+milli/MilliManager.class
+milli/ConnectSSH.class
