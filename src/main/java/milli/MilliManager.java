@@ -109,56 +109,7 @@ public class MilliManager {
         return getAskSpeechletResponse(speech_output, help_text);
      }
     
-    /**
-     * Sends net_mgr command to get status of appliance
-     * 
-     * @param current appliance 
-     *            the object which we are sending the command
-     *            
-     * @return int status of appliance (1 = off/closed, 0 = on/open)
-     */
-    public int getStatusOfAppliance(MilliDevice CURRENT_APPLIANCE){
-    	net_mgr_cmd[6] = CURRENT_APPLIANCE.getMac_addr();
-    	net_mgr_cmd[9] = "get 17";
-
-    	//execute net manager command
-    	Runtime rt = Runtime.getRuntime();
-    	Process pr = null;
-    	try {
-			pr = rt.exec(cmd);
-			
-			try {
-				pr.waitFor();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (IOException e1) {
-			//To Do: log error
-		}
  
-    	if (pr == null) return -1;
-    	
-    	InputStream stdin = pr.getInputStream();
-    	InputStreamReader isr = new InputStreamReader(stdin);
-    	BufferedReader br = new BufferedReader(isr);
-    	String response = null;
-		try {
-			response = br.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	
-		//if (response.equals(null)) return -1;
-		
-    	//net_mgr -d fd04:7c3e:be2f:1:213:5005:ff06:621c mnic io get 17
-    	//Response is “IO 17 = 1” for light is off.
-		return response.charAt(response.length()-1);
-		//return response.toString();
-    
-    }
-
     /**
      * Prepares the speech to reply to the user. User has indicated that they would like to change status
      * of appliance.  Issues net manager command and change status of appliance in the db.
@@ -169,19 +120,20 @@ public class MilliManager {
      * 
      */
     public SpeechletResponse handleChangeStatusRequest(Session session) {
-    	String speechText = "Ok" + CURRENT_APPLIANCE.getNextText();
+    	String speechText = "Ok, let me do that for you"; //+ CURRENT_APPLIANCE.getNextText();
 
     	ConnectSSH connect = new ConnectSSH();
-    	List<String> output = null;
-    	if (CURRENT_APPLIANCE.getName().equals("garage_door")){    		
-    		output = connect.executeFile("/home/ciq/toggleDoor.sh");
-    	} else {
-    		if (CURRENT_APPLIANCE.getNextAction().equals("turn it on?")){
-    			output = connect.executeFile("/home/ciq/turnOnLight.sh");
-    		} else {
-    			output = connect.executeFile("/home/ciq/turnOffLight.sh");
-    		}
-    	}
+    	List<String> output = connect.executeFile("/home/ciq/toggleDoor.sh");
+//    	if (CURRENT_APPLIANCE.getName().equals("garage_door")){    		
+//    		output = connect.executeFile("/home/ciq/toggleDoor.sh");
+//    	} else {
+//    		if (CURRENT_APPLIANCE.getNextAction().equals("turn it on?")){
+//    			output = connect.executeFile("/home/ciq/turnOnLight.sh");
+//    		} else {
+//    			output = connect.executeFile("/home/ciq/turnOffLight.sh");
+//    		}
+//    	}
+    	
     	
     	return getTellSpeechletResponse(speechText);	
 
@@ -190,37 +142,21 @@ public class MilliManager {
     public SpeechletResponse handleGetTempRequest(Intent intent, Session session) {
     	String speechText = "the temperature is ";
 
-    	//prepare net manager command
-    	net_mgr_cmd[6] = "fd04:7c3e:be2f:1:213:5005:ff06:6259";
-    	net_mgr_cmd[9] = "adc 30";
-
-    	//execute net manager command
-    	Runtime rt = Runtime.getRuntime();
-    	Process pr = null;
-    	try {
-			pr = rt.exec(net_mgr_cmd);
-		} catch (IOException e1) {
-			//To Do: log error
+    	ConnectSSH connect = new ConnectSSH();
+    	List<String> output = connect.executeFile("/home/ciq/getTemp.sh");
+        String outputStr = null;
+        for (String line : output){
+        	outputStr = outputStr + line;
 		}
-    	if (pr.equals(null)) return getTellSpeechletResponse("Failure to issue net manager command");
+    	
+		if (outputStr.equals(null)) return getTellSpeechletResponse("Error: Unable in net manager command response");
 
-    	InputStream stdin = pr.getInputStream();
-    	InputStreamReader isr = new InputStreamReader(stdin);
-    	BufferedReader br = new BufferedReader(isr);
-    	String response = null;
-		try {
-			response = br.readLine();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		//String output = outputStr.substring(0, outputStr.length()-2);
+		//double temp = (Double.parseDouble(output) - 1035) / -5.5 ;
 		
-		if (response.equals(null)) return getTellSpeechletResponse("Error: Unable in net manager command response");
-		String output = response.substring(0, response.length()-2);
-		double temp = (Double.parseDouble(output) - 1035) / -5.5 ;
-		
-		speechText = speechText + String.valueOf(temp) + "degrees Celcius";
+		//speechText = speechText + String.valueOf(temp) + "degrees Celcius";
 
+		speechText = speechText + outputStr;
     	return getTellSpeechletResponse(speechText);	
 
     }
