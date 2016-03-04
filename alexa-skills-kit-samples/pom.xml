@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>alexa-skills-kit-samples</groupId>
   <artifactId>alexa-skills-kit-samples</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <version>1.0</version>
   <name>Alexa Skills Kit Samples</name>
   <url>http://developer.amazon.com/ask</url>
@@ -62,6 +62,11 @@
       <artifactId>aws-java-sdk-dynamodb</artifactId>
       <version>1.9.40</version>
     </dependency>
+     <dependency>
+	<groupId>com.jcraft</groupId>
+	<artifactId>jsch</artifactId>
+	<version>0.1.53</version>
+    </dependency>
   </dependencies>
 
   <properties>
@@ -71,7 +76,6 @@
   </properties>
 
   <build>
-    <finalName>alexa-skills-kit-samples</finalName>
     <pluginManagement>
       <plugins>
         <plugin>

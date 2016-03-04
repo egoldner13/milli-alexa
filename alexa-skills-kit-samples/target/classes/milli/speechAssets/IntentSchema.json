@@ -1,34 +1,34 @@
 {
   "intents": [
     {
-      "intent": "GetStatusOfAppliance",
+      "intent": "GetStatusOfDoor"
+    },
+    {
+      "intent": "ChangeStatusOfDoor"
+    },
+    {
+      "intent": "HandleNextResponseDoor"
+    },
+    {
+      "intent": "GetStatusOfLight"
+    },
+    {
+      "intent": "ChangeStatusOfLight", 
       "slots": [
         {
-          "name": "appliance",
-          "type": "LIST_OF_APPS"
+          "name": "status",
+          "type": "STATUS_OPTIONS"
         }
       ]
     },
     {
-      "intent": "ChangeStatusOfAppliance"
+      "intent": "HandleNextResponseLight"
     },
     {
-      "intent": "GetTemperatureIntent", 
-      "slots": [
-        {
-          "name": "room",
-          "type": "LIST_OF_ROOMS"
-        }
-      ]
+      "intent": "GetTemperatureIntent"
     },
     {
-      "intent": "GetGasLevelIntent", 
-      "slots": [
-        {
-          "name": "appliance",
-          "type": "LIST_OF_ROOMS"
-        }
-      ]
+      "intent": "GetGasLevelIntent"
     },
     {
       "intent": "GetStatusOfCar"

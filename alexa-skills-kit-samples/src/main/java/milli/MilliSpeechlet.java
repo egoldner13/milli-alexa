@@ -69,11 +69,23 @@ public class MilliSpeechlet implements Speechlet {
         initializeComponents();
 
         Intent intent = request.getIntent();
-        if ("GetStatusOfAppliance".equals(intent.getName())) {
-            return milliManager.handleGetStatusRequest(intent, session);
+        if ("GetStatusOfDoor".equals(intent.getName())) {
+            return milliManager.handleGetStatusDoorRequest(session);
 
-        } else if ("ChangeStatusOfAppliance".equals(intent.getName())) {
-            return milliManager.handleChangeStatusRequest(session);
+        } else if ("HandleNextResponseDoor".equals(intent.getName())) {
+            return milliManager.handleChangeStatusDoorRequest(session);
+        
+        } else if ("ChangeStatusOfDoor".equals(intent.getName())) {
+            return milliManager.handleChangeStatusDoorRequest(session);
+            
+        } else if ("GetStatusOfLight".equals(intent.getName())) {
+            return milliManager.handleGetStatusLightRequest(session);
+            
+        } else if ("HandleNextResponseLight".equals(intent.getName())) {
+            return milliManager.handleChangeStatusLightRequest(session);
+        
+        } else if ("ChangeStatusOfLight".equals(intent.getName())) {
+            return milliManager.handleChangeStatusLightRequest(intent, session);
             
         } else if ("GetTemperatureIntent".equals(intent.getName())) {
             return milliManager.handleGetTempRequest(intent, session);
@@ -81,9 +93,6 @@ public class MilliSpeechlet implements Speechlet {
         } else if ("GetGasLevelIntent".equals(intent.getName())) {
             return milliManager.handleGetGasLevelRequest(intent, session);
             
-        } else if ("GetStatusOfCar".equals(intent.getName())) {
-            return milliManager.handleStatusOfCarRequest(intent, session);
-
         } else if ("AMAZON.HelpIntent".equals(intent.getName())) {
             return milliManager.getHelpIntentResponse(intent, session, skillContext);
 

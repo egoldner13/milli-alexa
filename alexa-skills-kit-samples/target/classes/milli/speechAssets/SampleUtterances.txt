@@ -1,36 +1,52 @@
-GetStatusOfAppliance if {appliance} is open
-GetStatusOfAppliance if {appliance} is closed
-GetStatusOfAppliance if the {appliance} is open
-GetStatusOfAppliance if the {appliance} is closed
-GetStatusOfAppliance if I left the {appliance} open
-GetStatusOfAppliance if I closed the {appliance}
-GetStatusOfAppliance about {appliance}
-GetStatusOfAppliance about the {appliance}
-GetStatusOfAppliance if {appliance} is on
-GetStatusOfAppliance if {appliance} is off
-GetStatusOfAppliance if the {appliance} is on
-GetStatusOfAppliance if the {appliance} is off
-GetStatusOfAppliance if I left the {appliance} on
-GetStatusOfAppliance if I shut off the {appliance}
-GetStatusOfAppliance if I shut the {appliance} off
-GetStatusOfAppliance about {appliance}
-GetStatusOfAppliance about the {appliance}
+GetStatusOfDoor if the garage is open
+GetStatusOfDoor if the garage is closed
+GetStatusOfDoor if the  garage door is open
+GetStatusOfDoor if the garage door is closed
+GetStatusOfDoor if I left the garage door open
+GetStatusOfDoor if I closed the garage door
+GetStatusOfDoor if I left the garage open
+GetStatusOfDoor if I closed the garage 
+GetStatusOfDoor about the garage
+GetStatusOfDoor about the garage door
 
-ChangeStatusOfAppliance yes
-ChangeStatusOfAppliance yup
-ChangeStatusOfAppliance sure
-ChangeStatusOfAppliance yes please
+HandleNextResponseDoor yes
+HandleNextResponseDoor yup
+HandleNextResponseDoor sure
+HandleNextResponseDoor yes please
 
-GetTemperatureIntent ww {room}
-GetTemperatureIntent what is the temperature in the {room}
+ChangeStatusOfDoor to close the garage door
+ChangeStatusOfDoor to open the garage door
+ChangeStatusOfDoor to close the garage
+ChangeStatusOfDoor to open the garage
+ChangeStatusOfDoor close the garage door
+ChangeStatusOfDoor open the garage door
+ChangeStatusOfDoor close the garage
+ChangeStatusOfDoor open the garage
 
-GetGasLevelIntent can you check the gas level in {room}
-GetGasLevelIntent what is the gas level in {room}
+GetStatusOfLight if light is on
+GetStatusOfLight if light is off
+GetStatusOfLight if the light is on
+GetStatusOfLight if the light is off
+GetStatusOfLight if I left the light on
+GetStatusOfLight if I shut off the light
+GetStatusOfLight if I shut the light off
+GetStatusOfLight about light 
+GetStatusOfLight about the light
 
-GetStatusOfCar is my car outside?
-GetStatusOfCar is the car outside?
-GetStatusOfCar is the car home?
-GetStatusOfCar where is the car? 
+ChangeStatusOfLight to turn {status} the light
+
+HandleNextResponseLight yes
+HandleNextResponseLight yup
+HandleNextResponseLight sure
+HandleNextResponseLight yes please
+
+GetTemperatureIntent to get the temperature
+GetTemperatureIntent what is the temperature
+GetTemperatureIntent if you know the temperature 
+
+GetGasLevelIntent can you check the gas level 
+GetGasLevelIntent what is the gas level
+GetGasLevelIntent is it safe
 
 AMAZON.StopIntent no
 AMAZON.StopIntent nope
